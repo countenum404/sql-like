@@ -1,10 +1,14 @@
 package com.digdes.school.operations;
 
+import com.digdes.school.ParserService;
+
+import java.util.Arrays;
 import java.util.Map;
 
 public class BooleanExecutor {
 
     private Map<String, Object> comparable;
+    private LogicalOperations operation;
 
     public void setComparable(Map<String, Object> comparable) {
         this.comparable = comparable;
@@ -22,12 +26,20 @@ public class BooleanExecutor {
             return left || right;
         }
         else {
-            //System.out.println("comparing " + tree.getKey() + "=" + comparable.get(tree.getKey()).getClass() + " isEquals " + tree.getValue().getClass());
-            var is = switcher((LogicalOperations) tree.getData(),
-                                                comparable.get(tree.getKey()),
-                                                tree.getValue());
-            //System.out.println(is);
-            return is;
+            if (tree.getData() instanceof String) {
+                String string = (String) tree.getData();
+                Arrays.stream(LogicalOperations.values())
+                        .forEach(op -> {
+                            if (string.contains(op.toString())){
+                                operation = op;
+                            }
+                        });
+                var keyValue = string.split(operation.toString());
+                var is = switcher(operation, comparable.get(keyValue[0]), ParserService.getType(keyValue[1]));
+                System.out.println(keyValue + " : " + is);
+                return is;
+            }
+            return false;
         }
     }
 

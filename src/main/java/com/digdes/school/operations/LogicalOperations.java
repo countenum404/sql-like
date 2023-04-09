@@ -1,18 +1,17 @@
 package com.digdes.school.operations;
 
-import java.util.regex.Pattern;
 
 public enum LogicalOperations {
     AND("AND"),
     OR("OR"),
     EQUALS("="),
-    NOT_EQUALS("!="),
-    LIKE("like"),
-    ILIKE("ilike"),
+    MORE(">"),
+    LESS("<"),
     MORE_EQUALS(">="),
     LESS_EQUALS("<="),
-    MORE(">"),
-    LESS("<");
+    NOT_EQUALS("!="),
+    LIKE("like"),
+    ILIKE("ilike");
 
     public boolean isEqualTypes(Object first,
                                        Object second) {

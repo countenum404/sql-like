@@ -57,8 +57,12 @@ public class BooleanTree {
         this.data = operation;
     }
 
-    public BooleanTree(Object data) {
+    public BooleanTree(String data) {
         this.data = data;
+    }
+
+    public BooleanTree(LogicalOperations operation) {
+        this.data = operation;
     }
 
     public BooleanTree() {

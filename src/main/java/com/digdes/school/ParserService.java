@@ -1,10 +1,14 @@
 package com.digdes.school;
 
+import com.digdes.school.operations.BooleanTree;
+import com.digdes.school.operations.LogicalOperations;
 import com.digdes.school.operations.OperationKeywords;
 import com.digdes.school.operations.OperationNotFoundException;
 import com.digdes.school.query.Query;
 
+import java.awt.event.WindowAdapter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ParserService {
     private String query;
@@ -24,13 +28,11 @@ public class ParserService {
                 .setIsValues(isValues)
                 .setValues(isValues ? parseValues() : null)
                 .setWhere(isWhere)
-                .setWhereValues(isWhere ? parseWhere() : null)
+                .setWhereValues(isWhere ? parseWhereRoot() : null)
                 .build();
     }
 
-    private List<Map<String, Object>> parseWhere() {
-        return null;
-    }
+
 
     private Optional<OperationKeywords> getOperation() {
         return Optional.of(OperationKeywords.valueOf(operation));
@@ -62,10 +64,90 @@ public class ParserService {
         return values;
     }
 
-    public Map<String, Object> getConditions() {
-        Map<String, Object> conditions = new Hashtable<>();
+    private BooleanTree parseWhereRoot() {
+        String valuesSubstring = query.substring(query.indexOf("WHERE") + "WHERE".length(),
+                                                 query.length()).trim();
+        //System.out.println(valuesSubstring);
+        BooleanTree parsedOrTree = parseByOr(valuesSubstring);
+        //System.out.println("PARSED OR");
+        BooleanTree parsedAndTree = walkAroundTreeForAnd(parsedOrTree);
+        //System.out.println("PARSED AND");
+        return parsedAndTree;
+    }
 
-        return conditions;
+
+    private BooleanTree walkAroundTreeForAnd(BooleanTree tree) {
+        if (tree.getData() == LogicalOperations.OR) {
+            tree.setLeft(walkAroundTreeForAnd(tree.getLeft()));
+            tree.setRight(walkAroundTreeForAnd(tree.getRight()));
+        }
+        if (tree.getData() instanceof String) {
+            return parseByAnd((String) tree.getData());
+        }
+        return tree;
+    }
+
+
+    private BooleanTree parseByOr(String query) {
+        BooleanTree booleanTree = new BooleanTree();
+        booleanTree.setRight(new BooleanTree());
+        booleanTree.setLeft(new BooleanTree());
+        var split = query.split(" OR | or ");
+        if (split.length == 1) {
+            booleanTree.setData(query);
+            return booleanTree;
+        }
+        for (var expression : split) {
+            if (booleanTree.getData() == null
+                    && booleanTree.getLeft().getData() == null
+                    && booleanTree.getRight().getData() == null) {
+                booleanTree.setData(LogicalOperations.OR);
+                booleanTree.getLeft().setData(expression);
+            } else if (booleanTree.getRight().getData() == null
+                    && booleanTree.getLeft().getData() != null
+                    && booleanTree.getData() != null) {
+                booleanTree.getRight().setData(expression);
+            } else if (booleanTree.getData() != null
+                    && booleanTree.getLeft().getData() != null
+                    && booleanTree.getRight().getData() != null) {
+                var newVertex = new BooleanTree(LogicalOperations.OR);
+                newVertex.setLeft(booleanTree);
+                newVertex.setRight(new BooleanTree(expression));
+                booleanTree = newVertex;
+            }
+        }
+        return booleanTree;
+    }
+
+    private BooleanTree parseByAnd(String query) {
+        BooleanTree booleanTree = new BooleanTree();
+        booleanTree.setRight(new BooleanTree());
+        booleanTree.setLeft(new BooleanTree());
+        var split = query.split(" AND | AND ");
+        if (split.length == 1) {
+            booleanTree.setData(query);
+            return booleanTree;
+        }
+        for (var expression : split) {
+            if (booleanTree.getData() == null
+                    && booleanTree.getLeft().getData() == null
+                    && booleanTree.getRight().getData() == null) {
+                booleanTree.setData(LogicalOperations.AND);
+                booleanTree.getLeft().setData(expression);
+            } else if (booleanTree.getRight().getData() == null
+                    && booleanTree.getLeft().getData() != null
+                    && booleanTree.getData() != null) {
+                booleanTree.getRight().setData(expression);
+            } else if (booleanTree.getData() != null
+                    && booleanTree.getLeft().getData() != null
+                    && booleanTree.getRight().getData() != null) {
+                var newVertex = new BooleanTree(LogicalOperations.AND);
+                newVertex.setLeft(booleanTree);
+                newVertex.setRight(new BooleanTree(expression));
+                booleanTree = newVertex;
+            }
+        }
+        return booleanTree;
     }
 
     public static Object getType(String atom) {

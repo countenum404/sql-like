@@ -1,5 +1,6 @@
 package com.digdes.school.query;
 
+import com.digdes.school.operations.BooleanTree;
 import com.digdes.school.operations.OperationKeywords;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class Query {
     private boolean isWhere;
 
     private Map<String, Object> values;
-    private List<Map<String, Object>> whereValues;
+    private BooleanTree whereValues;
 
     public Query() {
 
@@ -21,7 +22,7 @@ public class Query {
                  boolean isValues,
                  boolean isWhere,
                  Map<String, Object> values,
-                 List<Map<String, Object>> whereValues) {
+                 BooleanTree whereValues) {
         this.operation = operation;
         this.isValues = isValues;
         this.isWhere = isWhere;
@@ -38,7 +39,7 @@ public class Query {
         private boolean isValues;
         private boolean isWhere;
         private Map<String, Object> values;
-        private List<Map<String, Object>> whereValues;
+        private BooleanTree whereValues;
 
         public QueryBuilder() {
 
@@ -64,7 +65,7 @@ public class Query {
             return this;
         }
 
-        public QueryBuilder setWhereValues(List<Map<String, Object>> whereValues) {
+        public QueryBuilder setWhereValues(BooleanTree whereValues) {
             this.whereValues = whereValues;
             return this;
         }
@@ -112,11 +113,11 @@ public class Query {
         this.values = values;
     }
 
-    public List<Map<String, Object>> getWhereValues() {
+    public BooleanTree getWhereValues() {
         return whereValues;
     }
 
-    public void setWhereValues(List<Map<String, Object>> whereValues) {
+    public void setWhereValues(BooleanTree whereValues) {
         this.whereValues = whereValues;
     }
 }
