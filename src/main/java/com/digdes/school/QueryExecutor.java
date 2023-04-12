@@ -1,7 +1,5 @@
 package com.digdes.school;
 
-import com.digdes.school.operations.OperationNotFoundException;
-
 import java.util.List;
 import java.util.Map;
 

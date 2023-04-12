@@ -1,4 +1,4 @@
-package com.digdes.school.operations;
+package com.digdes.school;
 
 public enum OperationKeywords {
     SELECT,

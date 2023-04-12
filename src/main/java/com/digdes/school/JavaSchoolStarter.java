@@ -1,19 +1,15 @@
 package com.digdes.school;
 
-import com.digdes.school.operations.BooleanExecutor;
-import com.digdes.school.operations.BooleanTree;
-import com.digdes.school.operations.OperationNotFoundException;
-import com.digdes.school.query.Query;
-
 import java.util.*;
 
 public class JavaSchoolStarter implements QueryExecutor {
 
-    private ParserService service;
+    private ParserService service = new ParserService();
+    private BooleanExecutor executor = new BooleanExecutor();
     private List<Map<String, Object>> database = new ArrayList<>();
 
     public JavaSchoolStarter() {
-        service = new ParserService();
+
     }
 
     @Override
@@ -33,7 +29,10 @@ public class JavaSchoolStarter implements QueryExecutor {
         return output;
     }
 
-    private List<Map<String, Object>> insert(Query query) {
+    private List<Map<String, Object>> insert(Query query) throws Exception {
+        if (query.getValues().keySet().stream().allMatch(k -> query.getValues().get(k).equals("null"))) {
+            throw new Exception("All values are null");
+        }
         database.add(query.getValues());
         return database;
     }
@@ -42,7 +41,6 @@ public class JavaSchoolStarter implements QueryExecutor {
         if (!query.isWhere())
             return database;
         BooleanTree tree = query.getWhereValues();
-        BooleanExecutor executor = new BooleanExecutor();
         List<Map<String, Object>> output = new ArrayList<>();
         for (var map:
              database) {
@@ -55,16 +53,57 @@ public class JavaSchoolStarter implements QueryExecutor {
     }
 
     private List<Map<String, Object>> update(Query query) {
-        return null;
+        if (!query.isWhere()) {
+            this.database.forEach(m -> {
+                query.getValues().forEach((k,v) -> {
+                    m.replace(k, m.get(k), v);
+                });
+            });
+            return database;
+        }
+        List<Map<String, Object>> output = new ArrayList<>();
+        this.database.forEach(m -> {
+            executor.setComparable(m);
+            try {
+                if (executor.execute(query.getWhereValues())) {
+                    query.getValues().forEach((k,v) -> {
+                        m.replace(k, m.get(k), v);
+                    });
+                    output.add(m);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return output;
     }
 
     private List<Map<String, Object>> delete(Query query) {
+        List<Map<String, Object>> output;
         if (!query.isWhere()) {
             database.clear();
-            return database;
+            output = database;
+            return output;
         }
-        return database;
+        output = new ArrayList<>();
+        this.database.forEach(m -> {
+            executor.setComparable(m);
+            try {
+                if (executor.execute(query.getWhereValues())) {
+                    output.add(m);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        this.database.removeIf(m -> {
+            try {
+                executor.setComparable(m);
+                return executor.execute(query.getWhereValues());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return output;
     }
-
-
 }

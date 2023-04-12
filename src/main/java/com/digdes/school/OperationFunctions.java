@@ -1,15 +1,10 @@
-package com.digdes.school.operations;
+package com.digdes.school;
 
 import java.util.regex.Pattern;
 
 public class OperationFunctions {
-
-    public static boolean and(boolean first, boolean second) {
-        return first && second;
-    }
-
-    public static boolean or(boolean first, boolean second) {
-        return first || second;
+    public static void throwUnsupportedTypeException(String classname, String operator) throws Exception {
+        throw new Exception("Operator " + operator + " doesn't support type of " + classname);
     }
 
     public static boolean isEquals(Object first,
@@ -24,8 +19,8 @@ public class OperationFunctions {
 
     public static boolean like(String pattern,
                                String string) {
-        string = string.toUpperCase();
-        pattern = pattern.toUpperCase();
+        string = string.replaceAll("'", "").trim();
+        pattern = pattern.replaceAll("'", "").trim();
         if (pattern.startsWith("%") && pattern.endsWith("%")){
             return string.contains(pattern.replaceAll("%", ""));
         }
@@ -40,9 +35,7 @@ public class OperationFunctions {
 
     public static boolean ilike(String pattern,
                                 String string) {
-        return Pattern.compile(
-                Pattern.quote(pattern.replaceAll("%", "")), Pattern.CASE_INSENSITIVE
-        ).matcher(string).find();
+        return like(pattern.toUpperCase(), string.toUpperCase());
     }
 
     public static boolean moreOrEquals(Object first,

@@ -1,9 +1,5 @@
-package com.digdes.school.query;
+package com.digdes.school;
 
-import com.digdes.school.operations.BooleanTree;
-import com.digdes.school.operations.OperationKeywords;
-
-import java.util.List;
 import java.util.Map;
 
 public class Query {
@@ -85,39 +81,15 @@ public class Query {
         return operation;
     }
 
-    public void setOperation(OperationKeywords operation) {
-        this.operation = operation;
-    }
-
-    public boolean isValues() {
-        return isValues;
-    }
-
-    public void setValues(boolean values) {
-        isValues = values;
-    }
-
     public boolean isWhere() {
         return isWhere;
-    }
-
-    public void setIsWhere(boolean where) {
-        isWhere = where;
     }
 
     public Map<String, Object> getValues() {
         return values;
     }
 
-    public void setValues(Map<String, Object> values) {
-        this.values = values;
-    }
-
     public BooleanTree getWhereValues() {
         return whereValues;
-    }
-
-    public void setWhereValues(BooleanTree whereValues) {
-        this.whereValues = whereValues;
     }
 }

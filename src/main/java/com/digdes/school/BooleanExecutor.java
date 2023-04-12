@@ -1,9 +1,8 @@
-package com.digdes.school.operations;
-
-import com.digdes.school.ParserService;
+package com.digdes.school;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 public class BooleanExecutor {
 
@@ -35,8 +34,11 @@ public class BooleanExecutor {
                             }
                         });
                 var keyValue = string.split(operation.toString());
-                var is = switcher(operation, comparable.get(keyValue[0]), ParserService.getType(keyValue[1]));
-                System.out.println(keyValue + " : " + is);
+                var mapValue = Optional.ofNullable(comparable.get(keyValue[0].trim()))
+                        .orElseThrow(() -> new Exception("Column " + keyValue[0].trim() + " is absent"));
+                var queryValue = ParserService.translateType(keyValue[1].trim());
+                this.typesCheck(operation, mapValue, queryValue);
+                var is = switcher(operation, mapValue, queryValue);
                 return is;
             }
             return false;
@@ -52,10 +54,10 @@ public class BooleanExecutor {
                 return OperationFunctions.isNotEquals(left, right);
             }
             case LIKE -> {
-                return OperationFunctions.like((String) left, (String) right);
+                return OperationFunctions.like((String) right, (String) left);
             }
             case ILIKE -> {
-                return OperationFunctions.ilike((String) left, (String) right);
+                return OperationFunctions.ilike((String) right, (String) left);
             }
             case MORE_EQUALS -> {
                 return OperationFunctions.moreOrEquals(left, right);
@@ -73,4 +75,24 @@ public class BooleanExecutor {
         return false;
     }
 
+    private void typesCheck(LogicalOperations operation, Object left, Object right) throws Exception {
+        switch (operation) {
+            case LIKE, ILIKE -> {
+                if (!(left instanceof String)){
+                    OperationFunctions.throwUnsupportedTypeException(left.getClass().getTypeName(), operation.toString());
+                }
+                if (!(right instanceof String)){
+                    OperationFunctions.throwUnsupportedTypeException(right.getClass().getTypeName(), operation.toString());
+                }
+            }
+            case LESS, LESS_EQUALS, MORE, MORE_EQUALS -> {
+                if (!(left instanceof Long || left instanceof Double)) {
+                    OperationFunctions.throwUnsupportedTypeException(left.getClass().getTypeName(), operation.toString());
+                }
+                if (!(right instanceof Long || right instanceof Double)) {
+                    OperationFunctions.throwUnsupportedTypeException(right.getClass().getTypeName(), operation.toString());
+                }
+            }
+        }
+    }
 }
