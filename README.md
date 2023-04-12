@@ -11,6 +11,6 @@ Collection implementation based on clear OpenJDK 18 and without any external dep
 - DELETE command
 - Conditions with keyword WHERE (implemented with boolean binary tree)
 
-Author: Denis Shabashov__
+Author: Denis Shabashov<br />
 e-mail: d.shabashov@icloud.com || countenum404@gmail.com
 
