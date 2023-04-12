@@ -48,7 +48,7 @@ public class ParserService {
         Arrays.stream(stringValues.split("(,|, | , | ,)")).forEach(i -> {
             i = i.trim();
             var pair = i.split( "=");
-            values.put(pair[0].trim(), translateType(pair[1].trim()));
+            values.put(pair[0].toUpperCase().trim(), translateType(pair[1].trim()));
         });
         return values;
     }
@@ -141,16 +141,16 @@ public class ParserService {
         if (atom.trim().equals("false")) {
             return false;
         }
-        if (atom.matches("(-?\\d+\\.\\d+)")) {
+        if (atom.trim().matches("(-?\\d+\\.\\d+)")) {
             return Double.parseDouble(atom);
         }
-        if (atom.matches("(-?[\\d]+)")) {
+        if (atom.trim().matches("(-?[\\d]+)")) {
             return Long.parseLong(atom);
         }
-        if (atom.matches("('.+')")) {
+        if (atom.trim().matches("('.+')")) {
             return atom;
         }
-        if (atom.equals("null")) {
+        if (atom.trim().equals("null")) {
             return "null";
         }
         return null;

@@ -34,8 +34,11 @@ public class BooleanExecutor {
                             }
                         });
                 var keyValue = string.split(operation.toString());
-                var mapValue = Optional.ofNullable(comparable.get(keyValue[0].trim()))
+                var mapValue = Optional.ofNullable(comparable.get(keyValue[0].toUpperCase().trim()))
                         .orElseThrow(() -> new Exception("Column " + keyValue[0].trim() + " is absent"));
+                if (mapValue.equals("null")) {
+                    return false;
+                }
                 var queryValue = ParserService.translateType(keyValue[1].trim());
                 this.typesCheck(operation, mapValue, queryValue);
                 var is = switcher(operation, mapValue, queryValue);
