@@ -1,4 +1,4 @@
-# JavaSchoolStarter
+# SQL-like language
 Introductory task, SQL-like collection data access
 
 Collection implementation based on clear OpenJDK 18 and without any external dependencies.
